@@ -8,7 +8,7 @@ set(PICO_BOARD pico_w)
 include($ENV{PICO_SDK_PATH}/external/pico_sdk_import.cmake)
 
 # Set name of project (as PROJECT_NAME) and C/C   standards
-project(blink C CXX ASM)
+project(Qin-v1 C CXX ASM)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 
@@ -24,6 +24,7 @@ add_compile_options(-Wall
 # Tell CMake where to find the executable source file
 add_executable(${PROJECT_NAME} 
     main.c
+        main.h
 )
 
 # Create map/bin/hex/uf2 files
