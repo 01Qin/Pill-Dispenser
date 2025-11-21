@@ -21,7 +21,7 @@
 	- Friday documentation organization 
 
 # Version control
-	- Github will have folders with everystage done by each person. At status meetings we merge these iterations 
+	- Github will have a branch for each person. At the end of the week, we will merge these iterations 
 	- in github we make iterations of the code update everytime you do something  
 	
 # Flow charts
