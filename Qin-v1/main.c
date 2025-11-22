@@ -10,6 +10,7 @@
 int main() {
     const uint buttons[] = {SW_1, SW_0, SW_2};
     const uint leds[] = {LED_D1};
+    const uint coil_pins[] = {IN1, IN2, IN3, IN4};
 
     // Initialize chosen serial port
     stdio_init_all();
@@ -93,4 +94,21 @@ uint clamp_to_wrap(const int bright_value) {
         return WRAP_VALUE;
     }
     return bright_value;
+}
+
+void ini_coil_pins(const uint *coil_pins) {
+    // Initialize all coil pins as outputs and set them LOW at startup
+    for (int i = 0; i < INS_SIZE; i++) {
+        gpio_init(coil_pins[i]);
+        gpio_set_dir(coil_pins[i], GPIO_OUT);
+        gpio_put(coil_pins[i], 0); // Ensure coils are off at startup
+    }
+}
+
+void ini_sensor() {
+    // Initialize the optical sensor input with internal pull-up resistor
+    gpio_init(SENSOR_PIN);
+    gpio_set_dir(SENSOR_PIN, GPIO_IN);
+    // Internal pull-up: SENSOR reads HIGH (1) when not blocked, LOW (0) when blocked
+    gpio_pull_up(SENSOR_PIN);
 }
