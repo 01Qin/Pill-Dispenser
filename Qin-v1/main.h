@@ -6,7 +6,7 @@
 #define QIN_V1_MAIN_H
 
 #include "pico/util/queue.h"
-#include "hardware/timer.h" // Added for timer functions
+#include "hardware/timer.h"
 
 #define CLK_DIV 125
 #define WRAP_VALUE 999
@@ -33,6 +33,9 @@
 #define LED_DELAY_MS 5 // No longer used, but kept define
 #define DISPENSE_INTERVAL_MS 30000 // 30 seconds
 #define BLINK_INTERVAL_MS 250      // Blink every 250ms
+#define TOTAL_DISPENSES 7
+#define PIEZO_PIN 28
+#define PIEZO_ADC_THRESHOLD 2000 // adjust empirically (0-4095)
 
 // Type of event coming from the interrupt callback
 typedef enum {
@@ -74,8 +77,8 @@ void leds_initialisation(const uint *leds);
 
 // Replaced blink_led with non-blocking PWM functions
 void set_brightness(const uint led_pin, uint brightness);
-void start_waiting_blink(const uint led_pin);
-void stop_waiting_blink(const uint led_pin);
+void start_blink(const uint led_pin);
+void stop_blink(const uint led_pin);
 
 uint clamp_to_wrap(int bright_value);
 
@@ -88,10 +91,10 @@ int do_calibration(const uint *coil_pins, const uint8_t sequence[8][4], int max,
 void step_motor(const uint *coil_pins, int step, const uint8_t sequence[8][4]);
 
 // Corrected prototype: moves a specific number of steps
-void run_motor(const uint *coil_pins, const uint8_t sequence[8][4], int steps_to_move);
+void run_motor_and_check_pill(const uint *coil_pins, const uint8_t sequence[8][4], int steps_to_move);
 
 // --- ISR and Callback Prototypes ---
-void gpio_callback(uint gpio, uint32_t events);
+void gpio_callback(uint gpio, uint32_t event_mask);
 bool blink_timer_callback(struct repeating_timer *t);
 bool dispense_timer_callback(struct repeating_timer *t);
 
