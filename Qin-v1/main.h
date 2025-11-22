@@ -41,9 +41,9 @@ const uint8_t sequence[8][4] = {
     {1, 0, 0, 1}
 };
 
+void blink_led (uint pin, int times, int delay_ms);
 void buttons_initialisation(const uint *buttons);
 void leds_initialisation(const uint *leds);
-bool light_switch(const uint *leds, uint brightness, bool on);
 void set_brightness(const uint *leds, uint brightness);
 uint clamp_to_wrap(int bright_value);
 
