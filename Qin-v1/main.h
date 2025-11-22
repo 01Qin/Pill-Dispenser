@@ -29,6 +29,20 @@
 #define STEP_DELAY_MS 2
 #define LED_DELAY_MS 5
 
+// Type of event coming from the interrupt callback
+typedef enum {
+    EVENT_SW_0,
+    EVENT_SW_1,
+    EVENT_SW_2
+} event_type;
+
+// Generic event passed from ISR to main loop through a queue
+typedef struct {
+    event_type type; // EVENT_BUTTON 0, 1, or 2
+    int32_t data; // BUTTON: 1 = press, 0 = release;
+} event_t;
+
+
 // Half-step sequence: A, AB, B, BC, C, CD, D, DA
 const uint8_t sequence[8][4] = {
     {1, 0, 0, 0},
@@ -52,7 +66,6 @@ void ini_coil_pins(const uint *coil_pins); // Initialize motor coil output pins 
 void ini_sensor(); // Initialize optical sensor input with internal pull-up
 int do_calibration(const uint *coil_pins, const uint8_t sequence[8][4], int max, int revolution_steps[3]); // Measure steps per revolution using the optical sensor
 void step_motor(const uint *coil_pins, int step, const uint8_t sequence[8][4]); // Perform one half-step of the stepper motor
-int get_avg(const int revolution_steps[3]); // Calculate the average of three revolution step counts
 void run_motor(const uint *coil_pins, const uint8_t sequence[8][4], int count, int steps_per_rev); // Run the motor for N * (1/8) revolutions using the calibrated steps per revolution
 
 
