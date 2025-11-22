@@ -7,6 +7,11 @@
 #include <stdlib.h>
 #include "main.h"
 
+#include "pico/util/queue.h"
+
+// Global event queue used by ISR (Interrupt Service Routine) and main loop
+static queue_t events;
+
 int main() {
     const uint buttons[] = {SW_1, SW_0, SW_2};
     const uint leds[] = {LED_D1};
@@ -14,6 +19,8 @@ int main() {
     int steps_per_rev = 4096; // Default steps per revolution before calibration
     int avg = 0;
     int revolution_steps[3] = {0, 0, 0}; // Array to store step counts between four consecutive edges
+    uint calib;
+    uint motor_move;
 
     // Initialise chosen serial port
     stdio_init_all();
@@ -22,21 +29,36 @@ int main() {
     // Initialise LED pins
     leds_initialisation(leds);
     //Initialise stepper motor pins
-    ini_coil_pins(coil_pins);
+    init_coil_pins(coil_pins);
     //Initialise optical sensor input
-    ini_sensor();
+    init_sensor();
 
     bool led_on = false;
-    bool sw1_pre_state = true; // SW1 is pulled up, so "released" = true
+    // bool sw2_pre_state = true; // SW2 is pulled up, so "released" = true
+    event_t event;
 
     while (true) {
-        if (gpio_get(SW_2) == 0) {
-            blink_led(LED_D1, SW_2, LED_DELAY_MS);
-        }
-        sleep_ms(50); // debounce
-    }
-}
+        // Process all pending events from the queue
+        while (queue_try_remove(&events, &event)) {
+            // Handle button events
+            if (event.type == EVENT_SW_1 && event.data) {
+                // Turn lights on
+                if (!led_on) {
+                    led_on = blink_led(LED_D1, SW_1, true);
+                }
+                else {
+                    led_on = blink_led(LED_D1, SW_1, false);
+                }
 
+            }
+            if (event.type == EVENT_SW_0 && led_on) {
+                calib = do_calibration(const uint *coil_pins, const uint8_t sequence[8][4], int max, int revolution_steps[3]);
+            }
+            if (event.type == EVENT_SW_2 && !led_on){
+                motor_move = run_motor();
+            }
+            sleep_ms(10);
+        }
 void init_buttons(const uint *buttons) {
     for (int i = 0; i < BUTTONS_SIZE; i++) {
         gpio_init(buttons[i]); // Enable the GPIO pin
@@ -81,13 +103,19 @@ void leds_initialisation(const uint *leds) {
 }
 
 // Function to blink LED
-void blink_led (uint led_pin, uint button_pin, int delay_ms) {
-while (gpio_get(button_pin) == 0){ // sw_2 pressed
-
-        gpio_put(led_pin, 1); // LED on
-        sleep_ms(delay_ms);
+bool blink_led (uint led_pin, uint button_pin, const bool on) {
+if (on) {
+    // sw_2 pressed
+    while (gpio_get(button_pin) == 0) {
+        gpio_put(led_pin, 1);
+        sleep_ms(5);
+        gpio_put(led_pin, 0);
+        sleep_ms(5);
+    }
+    return true;
+}else {
         gpio_put(led_pin, 0); // LED off
-        sleep_ms(delay_ms);
+        return false;
     }
 }
 
@@ -103,7 +131,7 @@ uint clamp_to_wrap(const int bright_value) {
     return bright_value;
 }
 
-void ini_coil_pins(const uint *coil_pins) {
+void init_coil_pins(const uint *coil_pins) {
     // Initialize all coil pins as outputs and set them LOW at startup
     for (int i = 0; i < INS_SIZE; i++) {
         gpio_init(coil_pins[i]);
@@ -112,13 +140,14 @@ void ini_coil_pins(const uint *coil_pins) {
     }
 }
 
-void ini_sensor() {
+void init_sensor() {
     // Initialize the optical sensor input with internal pull-up resistor
     gpio_init(SENSOR_PIN);
     gpio_set_dir(SENSOR_PIN, GPIO_IN);
     // Internal pull-up: SENSOR reads HIGH (1) when not blocked, LOW (0) when blocked
     gpio_pull_up(SENSOR_PIN);
 }
+
 int do_calibration(const uint *coil_pins, const uint8_t sequence[8][4], const int max, int revolution_steps[3]) {
     int count = 0; // Number of falling edges detected
     int step = 0; // total half-steps taken
