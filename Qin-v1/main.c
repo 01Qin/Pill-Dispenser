@@ -11,13 +11,20 @@ int main() {
     const uint buttons[] = {SW_1, SW_0, SW_2};
     const uint leds[] = {LED_D1};
     const uint coil_pins[] = {IN1, IN2, IN3, IN4};
+    int steps_per_rev = 4096; // Default steps per revolution before calibration
+    int avg = 0;
+    int revolution_steps[3] = {0, 0, 0}; // Array to store step counts between four consecutive edges
 
-    // Initialize chosen serial port
+    // Initialise chosen serial port
     stdio_init_all();
-    // Initialize buttons
+    // Initialise buttons
     init_buttons(buttons);
-    // Initialize LED pins
+    // Initialise LED pins
     leds_initialisation(leds);
+    //Initialise stepper motor pins
+    ini_coil_pins(coil_pins);
+    //Initialise optical sensor input
+    ini_sensor();
 
     bool led_on = false;
     bool sw1_pre_state = true; // SW1 is pulled up, so "released" = true
