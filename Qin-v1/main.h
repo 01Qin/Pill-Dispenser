@@ -35,7 +35,6 @@
 #define DISPENSE_INTERVAL_MS 30000 // 30 seconds
 #define BLINK_INTERVAL_MS 250      // Blink every 250ms
 #define TOTAL_DISPENSES 7
-#define PIEZO_PIN 28
 #define PIEZO_ADC_THRESHOLD 2000 // adjust empirically (0-4095)
 
 // Type of event coming from the interrupt callback
