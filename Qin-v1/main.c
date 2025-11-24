@@ -115,7 +115,6 @@ int main() {
                     break;
             }
         }
-
         // Allow the processor to sleep when no events are pending
         sleep_ms(10);
     }
