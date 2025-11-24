@@ -41,7 +41,8 @@
 typedef enum {
     EVENT_SW_0,
     EVENT_SW_1,
-    EVENT_SW_2
+    EVENT_SW_2,
+    EVENT_DISPENSE_STEP
 } event_type;
 
 // Generic event passed from ISR to main loop through a queue
@@ -56,6 +57,7 @@ typedef enum {
     STATE_CALIBRATING, // (This is a transient state in the main loop)
     STATE_READY,       // Solid LED, waiting to start dispense
     STATE_DISPENSING   // Dispensing every 30 seconds
+
 } st_dispenser;
 
 // Half-step sequence: A, AB, B, BC, C, CD, D, DA
