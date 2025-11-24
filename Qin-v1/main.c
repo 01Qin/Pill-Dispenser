@@ -22,6 +22,8 @@ static const uint g_leds[] = {LED_D1};
 static int g_steps_per_rev = 4096; // Default, will be updated by calibration
 static int dispensed_count = 0;
 
+bool timer_active = false;
+
 // --- Main Application ---
 int main() {
     const uint buttons[] = {SW_1, SW_0, SW_2};
@@ -102,7 +104,12 @@ int main() {
                 case STATE_DISPENSING:
                     if (event.type == EVENT_SW_1) {
                         printf("SW_1 pressed. Stopping dispense cycle.\r\n");
-                        cancel_repeating_timer(&dispense_timer);
+
+                        if (timer_active) {
+                            cancel_repeating_timer(&dispense_timer);
+                            timer_active = false;
+                        }
+
                         set_brightness(g_leds[0], 0); // LED off
                         current_state = STATE_WAITING;
                         start_blink(g_leds[0]); // Start waiting blink again
