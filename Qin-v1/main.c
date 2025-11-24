@@ -23,6 +23,9 @@ static int g_steps_per_rev = 4096; // Default, will be updated by calibration
 static int dispensed_count = 0;
 
 bool timer_active = false;
+// Blink timer guards
+static bool waiting_blink_running = false;
+static bool dispense_timer_active = false;
 
 // --- Main Application ---
 int main() {
@@ -63,7 +66,7 @@ int main() {
             switch (current_state) {
 
                 case STATE_WAITING:
-                    if (event.type == EVENT_SW_2) {
+                    if (event.type == EVENT_SW_1) {
                         printf("SW_2 pressed. Starting calibration...\r\n");
                         current_state = STATE_CALIBRATING; // Set transient state
                         stop_blink(g_leds[0]);
@@ -96,7 +99,12 @@ int main() {
                         run_motor_and_check_pill(g_coil_pins, sequence, g_steps_per_rev / 7); // 7 compartments
 
                         // 2. Start 30-second timer for future dispenses
-                        add_repeating_timer_ms(DISPENSE_INTERVAL_MS, dispense_timer_callback, NULL, &dispense_timer);
+                        if (add_repeating_timer_ms(DISPENSE_INTERVAL_MS, dispense_timer_callback, NULL, &dispense_timer)) {
+                            dispense_timer_active = true;
+                        } else {
+                            printf("ERROR: failed to start dispense timer.\r\n");
+                            current_state =STATE_READY;
+                        }
                         printf("State: DISPENSING. Press SW_1 to stop.\r\n");
                     }
                     break;
@@ -105,6 +113,7 @@ int main() {
                     if (event.type == EVENT_SW_1) {
                         printf("SW_1 pressed. Stopping dispense cycle.\r\n");
 
+                        // ensure no undefined behaviour if SW_1 is pressed before SW_0
                         if (timer_active) {
                             cancel_repeating_timer(&dispense_timer);
                             timer_active = false;
