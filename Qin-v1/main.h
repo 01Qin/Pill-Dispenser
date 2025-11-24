@@ -12,9 +12,9 @@
 #define WRAP_VALUE 999
 #define PWM_MAX 1000
 
-#define SW_1 8 // middle button - Power off/on the dispenser
+#define SW_1 8 // middle button - Power off/on the dispenser, starts the motor, calibration, LED
 #define SW_0 9 // left button - dispense pills
-#define SW_2 7 // right button - Starts the motor, calibration, LED
+#define SW_2 7 // right button - Reset motor state
 #define BUTTONS_SIZE 3
 
 #define LED_D1 22 // right LED
@@ -41,7 +41,8 @@
 typedef enum {
     EVENT_SW_0,
     EVENT_SW_1,
-    EVENT_SW_2
+    EVENT_SW_2,
+    EVENT_DISPENSE_STEP
 } event_type;
 
 // Generic event passed from ISR to main loop through a queue
