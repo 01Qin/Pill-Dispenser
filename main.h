@@ -25,8 +25,9 @@
 #define OPTO_PIN 28 // Optical fork input with pull-up
 #define PIEZO_PIN 27 // Piezo sensor input with pull-up
 #define SAFE_MAX_STEPS 20480 // Safety limit: 5 * 4096 steps
-#define STEP_DELAY_MS 1
+#define STEP_DELAY_MS 2
 #define ALIGNMENT_STEPS 100
+
 #define LED_DELAY_MS 5 // No longer used, but kept define
 #define DISPENSE_INTERVAL_MS 30000 // 30 seconds
 #define BLINK_INTERVAL_MS 250      // Blink every 250ms
@@ -91,6 +92,7 @@ void step_motor(const uint *coil_pins, int step, const uint8_t sequence[8][4]);
 //  moves a specific number of steps
 void run_motor_and_check_pill(const uint *coil_pins, const uint8_t sequence[8][4], int steps_to_move);
 void align_motor(const uint *coil_pins, const uint8_t sequence[8][4]);
+int get_next_compartment_steps();
 
 // --- ISR and Callback Prototypes ---
 void gpio_callback(uint gpio, uint32_t event_mask);
