@@ -19,7 +19,7 @@ The code relies on the following components and pin definitions:
 | Component | Pin Type/Function | Role |
 | :--- | :--- | :--- |
 | **Microcontroller** | Raspberry RP2040 | Core processing unit. |
-| **Stepper Motor** | Four Coil Pins (IN1-IN4) | Drives the carousel/dispensing mechanism. |
+| **Stepper Motor** |  28BYJ-48 Four Coil Pins (IN1-IN4) | Drives the carousel/dispensing mechanism. |
 | **Motor Driver** | ULN2003 | Interface between the Microcontroller and the stepper motor. |
 | **Optical Sensor** | `OPTO_PIN` | Used during calibration to detect a reference edge. |
 | **Piezo Sensor** | `PIEZO_PIN` | Used during dispensing to detect the physical drop of a pill (ISR driven). |
